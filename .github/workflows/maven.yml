@@ -1,0 +1,42 @@
+name: Java CI with Maven and Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Build Docker image
+      run: |
+        docker build -t java-board-game:latest .
+
+    # Optional: upload the Docker image as a build artifact
+    - name: Save Docker image artifact
+      run: |
+        mkdir -p docker-image
+        docker save java-board-game:latest | gzip > docker-image/java-board-game.tar.gz
+      shell: bash
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: java-board-game-docker
+        path: docker-image/java-board-game.tar.gz
