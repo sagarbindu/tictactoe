@@ -22,11 +22,14 @@ jobs:
         cache: maven
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file tictactoe-maven/pom.xml
 
     - name: Build Docker image
       run: |
-        docker build -t java-board-game:latest .
+        docker build \
+          -t java-board-game:latest \
+          -f tictactoe-maven/Dockerfile \
+          tictactoe-maven
 
     # Optional: upload the Docker image as a build artifact
     - name: Save Docker image artifact
